@@ -1,0 +1,38 @@
+{
+  "name": "oc-p9-billed",
+  "version": "0.0.0",
+  "description": "Administrative website for Human Resource employees.",
+  "main": "./client/index.html",
+  "scripts": {
+    "install-client": "cd ./client && npm i",
+    "install-server": "cd ./server && npm i",
+    "install-all": "npm i && npm run install-server && npm run install-client",
+    "server-dev": "cd ./server && npm run run:dev",
+    "client": "cd ./client && npm run start",
+    "test-client": "cd ./client & npm run test",
+    "test-server": "cd ./server & npm run test",
+    "start-dev": "npm run install-all && concurrently \"npm run server-dev\" \"npm run client\" & npm run test-client",
+    "start": "npm run install-all && concurrently \"npm run server-dev\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miervaldis42/oc-p9-billed.git"
+  },
+  "keywords": [
+    "OpenClassrooms",
+    "oc",
+    "Project 9",
+    "p9",
+    "jest"
+  ],
+  "author": "miervaldis42",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/miervaldis42/oc-p9-billed/issues"
+  },
+  "homepage": "https://github.com/miervaldis42/oc-p9-billed#readme",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "concurrently": "^8.2.2"
+  }
+}
