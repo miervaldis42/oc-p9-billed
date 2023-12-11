@@ -7,7 +7,7 @@ import Login from "../containers/Login.js";
 import { ROUTES } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
 
-describe("Given that I am a user on login page", () => {
+describe("Employee case : Given that I am a user as employee on 'Login' page", () => {
   describe("When I do not fill fields and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
@@ -117,8 +117,8 @@ describe("Given that I am a user on login page", () => {
   });
 });
 
-describe("Given that I am a user on login page", () => {
-  describe("When I do not fill fields and I click on admin button Login In", () => {
+describe("Admin case : Given that I am a user on 'Login' page", () => {
+  describe("When I do not fill fields and I click on admin button 'Login In'", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
 
@@ -160,13 +160,16 @@ describe("Given that I am a user on login page", () => {
 
   describe("When I do fill fields in correct format and I click on admin button Login In", () => {
     test("Then I should be identified as an HR admin in app", () => {
-      document.body.innerHTML = LoginUI();
+      // Data
       const inputData = {
         type: "Admin",
         email: "johndoe@email.com",
         password: "azerty",
         status: "connected",
       };
+
+      // Screen
+      document.body.innerHTML = LoginUI();
 
       const inputEmailUser = screen.getByTestId("admin-email-input");
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
@@ -189,7 +192,9 @@ describe("Given that I am a user on login page", () => {
         writable: true,
       });
 
-      // we have to mock navigation to test it
+      const JSONInputData = JSON.stringify(inputData);
+      window.localStorage.setItem("user", JSONInputData);
+
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -210,16 +215,12 @@ describe("Given that I am a user on login page", () => {
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
+
       expect(handleSubmit).toHaveBeenCalled();
       expect(window.localStorage.setItem).toHaveBeenCalled();
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         "user",
-        JSON.stringify({
-          type: "Admin",
-          email: inputData.email,
-          password: inputData.password,
-          status: "connected",
-        })
+        JSONInputData
       );
     });
 
