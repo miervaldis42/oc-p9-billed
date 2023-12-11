@@ -160,7 +160,7 @@ describe("Admin case : Given that I am a user on 'Login' page", () => {
 
   describe("When I do fill fields in correct format and I click on admin button Login In", () => {
     test("Then I should be identified as an HR admin in app", () => {
-      // Data
+      // Dummy Data
       const inputData = {
         type: "Admin",
         email: "johndoe@email.com",
@@ -168,9 +168,7 @@ describe("Admin case : Given that I am a user on 'Login' page", () => {
         status: "connected",
       };
 
-      // Screen
-      document.body.innerHTML = LoginUI();
-
+      // Set values into inputs
       const inputEmailUser = screen.getByTestId("admin-email-input");
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
       expect(inputEmailUser.value).toBe(inputData.email);
@@ -181,16 +179,8 @@ describe("Admin case : Given that I am a user on 'Login' page", () => {
       });
       expect(inputPasswordUser.value).toBe(inputData.password);
 
+      // Login procedure
       const form = screen.getByTestId("form-admin");
-
-      // localStorage should be populated with form data
-      Object.defineProperty(window, "localStorage", {
-        value: {
-          getItem: jest.fn(() => null),
-          setItem: jest.fn(() => null),
-        },
-        writable: true,
-      });
 
       const JSONInputData = JSON.stringify(inputData);
       window.localStorage.setItem("user", JSONInputData);
@@ -198,7 +188,6 @@ describe("Admin case : Given that I am a user on 'Login' page", () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
       let PREVIOUS_LOCATION = "";
 
       const store = jest.fn();
@@ -211,6 +200,7 @@ describe("Admin case : Given that I am a user on 'Login' page", () => {
         store,
       });
 
+      // Form submission
       const handleSubmit = jest.fn(login.handleSubmitAdmin);
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
