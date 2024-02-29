@@ -1,6 +1,6 @@
 {
   "name": "oc-p9-billed",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Administrative website for Human Resource employees.",
   "main": "./client/index.html",
   "scripts": {
