@@ -7,7 +7,7 @@ import Login from "../containers/Login.js";
 import { ROUTES } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
 
-describe("Given that I am a user on login page", () => {
+describe("Employee case : Given that I am a user as employee on 'Login' page", () => {
   describe("When I do not fill fields and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
@@ -117,8 +117,8 @@ describe("Given that I am a user on login page", () => {
   });
 });
 
-describe("Given that I am a user on login page", () => {
-  describe("When I do not fill fields and I click on admin button Login In", () => {
+describe("Admin case : Given that I am a user on 'Login' page", () => {
+  describe("When I do not fill fields and I click on admin button 'Login In'", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
 
@@ -160,7 +160,7 @@ describe("Given that I am a user on login page", () => {
 
   describe("When I do fill fields in correct format and I click on admin button Login In", () => {
     test("Then I should be identified as an HR admin in app", () => {
-      document.body.innerHTML = LoginUI();
+      // Dummy Data
       const inputData = {
         type: "Admin",
         email: "johndoe@email.com",
@@ -168,6 +168,7 @@ describe("Given that I am a user on login page", () => {
         status: "connected",
       };
 
+      // Set values into inputs
       const inputEmailUser = screen.getByTestId("admin-email-input");
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
       expect(inputEmailUser.value).toBe(inputData.email);
@@ -178,22 +179,15 @@ describe("Given that I am a user on login page", () => {
       });
       expect(inputPasswordUser.value).toBe(inputData.password);
 
+      // Login procedure
       const form = screen.getByTestId("form-admin");
 
-      // localStorage should be populated with form data
-      Object.defineProperty(window, "localStorage", {
-        value: {
-          getItem: jest.fn(() => null),
-          setItem: jest.fn(() => null),
-        },
-        writable: true,
-      });
+      const JSONInputData = JSON.stringify(inputData);
+      window.localStorage.setItem("user", JSONInputData);
 
-      // we have to mock navigation to test it
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
       let PREVIOUS_LOCATION = "";
 
       const store = jest.fn();
@@ -206,20 +200,17 @@ describe("Given that I am a user on login page", () => {
         store,
       });
 
+      // Form submission
       const handleSubmit = jest.fn(login.handleSubmitAdmin);
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
+
       expect(handleSubmit).toHaveBeenCalled();
       expect(window.localStorage.setItem).toHaveBeenCalled();
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         "user",
-        JSON.stringify({
-          type: "Admin",
-          email: inputData.email,
-          password: inputData.password,
-          status: "connected",
-        })
+        JSONInputData
       );
     });
 
