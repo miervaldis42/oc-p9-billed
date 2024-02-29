@@ -2,6 +2,9 @@ import { ROUTES_PATH } from "../constants/routes.js";
 import { formatDate, formatStatus } from "../app/format.js";
 import Logout from "./Logout.js";
 
+export const orderByDescendingOrder = (a, b) =>
+  new Date(b.date) - new Date(a.date);
+
 export default class {
   constructor({ document, onNavigate, store, localStorage }) {
     this.document = document;
@@ -41,7 +44,7 @@ export default class {
         .bills()
         .list()
         .then((snapshot) => {
-          const bills = snapshot.map((doc) => {
+          const bills = snapshot.sort(orderByDescendingOrder).map((doc) => {
             try {
               return {
                 ...doc,
@@ -51,7 +54,6 @@ export default class {
             } catch (e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
-              console.log(e, "for", doc);
               return {
                 ...doc,
                 date: doc.date,
@@ -59,7 +61,7 @@ export default class {
               };
             }
           });
-          console.log("length", bills.length);
+
           return bills;
         });
     }
