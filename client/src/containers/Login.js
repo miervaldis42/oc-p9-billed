@@ -12,20 +12,27 @@ export default class Login {
   }) {
     this.document = document;
     this.localStorage = localStorage;
+
     this.onNavigate = onNavigate;
     this.PREVIOUS_LOCATION = PREVIOUS_LOCATION;
+
     this.store = store;
+
     const formEmployee = this.document.querySelector(
       `form[data-testid="form-employee"]`
     );
     formEmployee.addEventListener("submit", this.handleSubmitEmployee);
+
     const formAdmin = this.document.querySelector(
       `form[data-testid="form-admin"]`
     );
     formAdmin.addEventListener("submit", this.handleSubmitAdmin);
   }
+
+  // Form Submission - Employee
   handleSubmitEmployee = (e) => {
     e.preventDefault();
+
     const user = {
       type: "Employee",
       email: e.target.querySelector(`input[data-testid="employee-email-input"]`)
@@ -42,18 +49,21 @@ export default class Login {
         this.onNavigate(ROUTES_PATH["Bills"]);
         this.PREVIOUS_LOCATION = ROUTES_PATH["Bills"];
         PREVIOUS_LOCATION = this.PREVIOUS_LOCATION;
+
         this.document.body.style.backgroundColor = "#fff";
       });
   };
 
+  // Form Submission - Admin
   handleSubmitAdmin = (e) => {
     e.preventDefault();
+
     const user = {
       type: "Admin",
-      email: e.target.querySelector(`input[data-testid="employee-email-input"]`)
+      email: e.target.querySelector(`input[data-testid="admin-email-input"]`)
         .value,
       password: e.target.querySelector(
-        `input[data-testid="employee-password-input"]`
+        `input[data-testid="admin-password-input"]`
       ).value,
       status: "connected",
     };
