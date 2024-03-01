@@ -16,13 +16,28 @@ import router from "../app/Router";
 jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an Admin", () => {
-  describe("When I am on Dashboard page, there are bills, and there is one pending", () => {
-    test("Then, filteredBills by pending status should return 1 bill", () => {
+  // Case: loading and errors
+  describe("When I am on Dashboard page but it is loading", () => {
+    test("Then, Loading page should be rendered", () => {
+      document.body.innerHTML = DashboardUI({ loading: true });
+      expect(screen.getAllByText("Loading...")).toBeTruthy();
+    });
+  });
+  describe("When I am on Dashboard page but back-end send an error message", () => {
+    test("Then, Error page should be rendered", () => {
+      document.body.innerHTML = DashboardUI({ error: "some error messages" });
+      expect(screen.getAllByText("Erreur")).toBeTruthy();
+    });
+  });
+
+  // Case: If bills are filtered on the right columns based on their status
+  describe("When I am on Dashboard page, I can see bills and there is one pending bill", () => {
+    test('Then, only 1 bill should appear in the "pending" column', () => {
       const filtered_bills = filteredBills(bills, "pending");
       expect(filtered_bills.length).toBe(1);
     });
   });
-  describe("When I am on Dashboard page, there are bills, and there is one accepted", () => {
+  describe("When I am on Dashboard page, I can see bills and there is one accepted bill", () => {
     test("Then, filteredBills by accepted status should return 1 bill", () => {
       const filtered_bills = filteredBills(bills, "accepted");
       expect(filtered_bills.length).toBe(1);
@@ -34,21 +49,19 @@ describe("Given I am connected as an Admin", () => {
       expect(filtered_bills.length).toBe(2);
     });
   });
-  describe("When I am on Dashboard page but it is loading", () => {
-    test("Then, Loading page should be rendered", () => {
-      document.body.innerHTML = DashboardUI({ loading: true });
-      expect(screen.getAllByText("Loading...")).toBeTruthy();
-    });
-  });
-  describe("When I am on Dashboard page but back-end send an error message", () => {
-    test("Then, Error page should be rendered", () => {
-      document.body.innerHTML = DashboardUI({ error: "some error message" });
-      expect(screen.getAllByText("Erreur")).toBeTruthy();
+
+  // Case: No bills
+  describe("When I am on Dashboard and there are no bills", () => {
+    test("Then, no card should be shown", () => {
+      document.body.innerHTML = cards([]);
+      const iconEdit = screen.queryByTestId("open-bill47qAXb6fIm2zOKkLzMro");
+      expect(iconEdit).toBeNull();
     });
   });
 
+  // Case: List od bills
   describe("When I am on Dashboard page and I click on arrow", () => {
-    test("Then, tickets list should be unfolding, and cards should appear", async () => {
+    test("Then, bill list should be unfolding and cards should appear", async () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -96,7 +109,6 @@ describe("Given I am connected as an Admin", () => {
       expect(handleShowTickets2).toHaveBeenCalled();
       await waitFor(() => screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`));
       expect(screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`)).toBeTruthy();
-
       icon3.addEventListener("click", handleShowTickets3);
       userEvent.click(icon3);
       expect(handleShowTickets3).toHaveBeenCalled();
@@ -105,8 +117,9 @@ describe("Given I am connected as an Admin", () => {
     });
   });
 
-  describe("When I am on Dashboard page and I click on edit icon of a card", () => {
-    test("Then, right form should be filled", () => {
+  //  Case: Click on a bill
+  describe("When I am on Dashboard page and I click on a card", () => {
+    test("Then, a form should appear on the right side of the screen and be filled with the bill information", () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -142,60 +155,11 @@ describe("Given I am connected as an Admin", () => {
       expect(screen.getByTestId(`dashboard-form`)).toBeTruthy();
     });
   });
-
-  describe("When I am on Dashboard page and I click 2 times on edit icon of a card", () => {
-    test("Then, big bill Icon should Appear", () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
-
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
-      });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Admin",
-        })
-      );
-
-      const dashboard = new Dashboard({
-        document,
-        onNavigate,
-        store: null,
-        bills: bills,
-        localStorage: window.localStorage,
-      });
-      document.body.innerHTML = DashboardUI({ data: { bills } });
-
-      const handleShowTickets1 = jest.fn((e) =>
-        dashboard.handleShowTickets(e, bills, 1)
-      );
-      const icon1 = screen.getByTestId("arrow-icon1");
-      icon1.addEventListener("click", handleShowTickets1);
-      userEvent.click(icon1);
-      expect(handleShowTickets1).toHaveBeenCalled();
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy();
-      const iconEdit = screen.getByTestId("open-bill47qAXb6fIm2zOKkLzMro");
-      userEvent.click(iconEdit);
-      userEvent.click(iconEdit);
-      const bigBilledIcon = screen.queryByTestId("big-billed-icon");
-      expect(bigBilledIcon).toBeTruthy();
-    });
-  });
-
-  describe("When I am on Dashboard and there are no bills", () => {
-    test("Then, no cards should be shown", () => {
-      document.body.innerHTML = cards([]);
-      const iconEdit = screen.queryByTestId("open-bill47qAXb6fIm2zOKkLzMro");
-      expect(iconEdit).toBeNull();
-    });
-  });
 });
 
-describe("Given I am connected as Admin, and I am on Dashboard page, and I clicked on a pending bill", () => {
-  describe("When I click on accept button", () => {
-    test("I should be sent on Dashboard with big billed icon instead of form", () => {
+describe("Given I am connected as Admin and I am on Dashboard page, I clicked on a pending bill", () => {
+  describe("When I click on 'Accept' button", () => {
+    test("I should be sent on Dashboard page with 'big bill' icon on the right side of the screen", () => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -230,8 +194,8 @@ describe("Given I am connected as Admin, and I am on Dashboard page, and I click
       expect(bigBilledIcon).toBeTruthy();
     });
   });
-  describe("When I click on refuse button", () => {
-    test("I should be sent on Dashboard with big billed icon instead of form", () => {
+  describe("When I click on 'Refuse' button", () => {
+    test("I should be sent on Dashboard with 'big bill' icon instead of form", () => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -267,7 +231,8 @@ describe("Given I am connected as Admin, and I am on Dashboard page, and I click
   });
 });
 
-describe("Given I am connected as Admin and I am on Dashboard page and I clicked on a bill", () => {
+// Case: Display a modal when I want to see the proof of the bill
+describe("Given I am connected as Admin and I am on Dashboard page, I click on a bill", () => {
   describe("When I click on the icon eye", () => {
     test("A modal should open", () => {
       Object.defineProperty(window, "localStorage", {
@@ -304,7 +269,7 @@ describe("Given I am connected as Admin and I am on Dashboard page and I clicked
   });
 });
 
-// test d'intégration GET
+// Test d'intégration GET
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
@@ -312,15 +277,17 @@ describe("Given I am a user connected as Admin", () => {
         "user",
         JSON.stringify({ type: "Admin", email: "a@a" })
       );
+
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
       router();
+
       window.onNavigate(ROUTES_PATH.Dashboard);
       await waitFor(() => screen.getByText("Validations"));
-      const contentPending = await screen.getByText("En attente (1)");
+      const contentPending = screen.getByText("En attente (1)");
       expect(contentPending).toBeTruthy();
-      const contentRefused = await screen.getByText("Refusé (2)");
+      const contentRefused = screen.getByText("Refusé (2)");
       expect(contentRefused).toBeTruthy();
       expect(screen.getByTestId("big-billed-icon")).toBeTruthy();
     });
@@ -337,6 +304,7 @@ describe("Given I am a user connected as Admin", () => {
             email: "a@a",
           })
         );
+
         const root = document.createElement("div");
         root.setAttribute("id", "root");
         document.body.appendChild(root);
