@@ -120,6 +120,7 @@ describe("Given I am connected as an Admin", () => {
   //  Case: Click on a bill
   describe("When I am on Dashboard page and I click on a card", () => {
     test("Then, a form should appear on the right side of the screen and be filled with the bill information", () => {
+      // Context
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -145,13 +146,29 @@ describe("Given I am connected as an Admin", () => {
       const handleShowTickets1 = jest.fn((e) =>
         dashboard.handleShowTickets(e, bills, 1)
       );
-      const icon1 = screen.getByTestId("arrow-icon1");
-      icon1.addEventListener("click", handleShowTickets1);
-      userEvent.click(icon1);
+
+      // Actions
+      // 1. Click on the arrow to open the 'Status Bill Container'
+      const arrowIcon1 = screen.getByTestId("arrow-icon1");
+      arrowIcon1.addEventListener("click", handleShowTickets1);
+      userEvent.click(arrowIcon1);
       expect(handleShowTickets1).toHaveBeenCalled();
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy();
-      const iconEdit = screen.getByTestId("open-bill47qAXb6fIm2zOKkLzMro");
-      userEvent.click(iconEdit);
+
+      // 2. Check if the status bill card  is displayed
+      const billCardToEdit = screen.getByTestId(
+        "open-bill47qAXb6fIm2zOKkLzMro"
+      );
+      expect(billCardToEdit).toBeTruthy();
+
+      // 3. Click on this status bill card
+      const handleEditTicket1 = jest.fn((e) =>
+        dashboard.handleEditTicket(e, bills[1], bills)
+      );
+      billCardToEdit.addEventListener("click", handleEditTicket1);
+      userEvent.click(billCardToEdit);
+      expect(handleEditTicket1).toHaveBeenCalled();
+
+      // Assertion: The right side of the page displays a form fulfilled with related bill data
       expect(screen.getByTestId(`dashboard-form`)).toBeTruthy();
     });
   });
