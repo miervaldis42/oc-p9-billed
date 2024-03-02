@@ -140,24 +140,40 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0;
     if (this.index === undefined || this.index !== index) this.index = index;
-    if (this.counter % 2 === 0) {
-      $(`#arrow-icon${this.index}`).css({ transform: "rotate(0deg)" });
-      $(`#status-bills-container${this.index}`).html(
-        cards(filteredBills(bills, getStatus(this.index)))
-      );
-      this.counter++;
-    } else {
-      $(`#arrow-icon${this.index}`).css({ transform: "rotate(90deg)" });
-      $(`#status-bills-container${this.index}`).html("");
-      this.counter++;
-    }
 
-    bills.forEach((bill) => {
-      $(`#open-bill${bill.id}`).click((e) =>
-        this.handleEditTicket(e, bill, bills)
-      );
+    // Define a flag variable to track whether the action has been taken
+    let actionTaken = false;
+
+    // Get all status bills headers of the page (3)
+    const allStatusBillsHeaders = $(`.status-bills-header`);
+    allStatusBillsHeaders.on("click", function () {
+      if (actionTaken) {
+        return; // Exit the event handler if the action has already been taken
+      }
+
+      // Manage 'Status Bills Container' display
+      if ($(`#status-bills-container${index}`)[0].children.length > 0) {
+        $(`#arrow-icon${index}`)[0].style = "";
+        $(`#status-bills-container${index}`).html("");
+
+        actionTaken = true;
+      } else {
+        $(`#arrow-icon${index}`).css({ transform: "rotate(0deg)" });
+        $(`#status-bills-container${index}`).html(
+          cards(filteredBills(bills, getStatus(index)))
+        );
+
+        actionTaken = true;
+      }
+    });
+
+    $(document).ready(() => {
+      bills.forEach((bill) => {
+        $(`#open-bill${bill.id}`).click((e) =>
+          this.handleEditTicket(e, bill, bills)
+        );
+      });
     });
 
     return bills;
