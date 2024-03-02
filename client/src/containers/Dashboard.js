@@ -97,14 +97,16 @@ export default class {
   handleEditTicket(e, bill, bills) {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
-    if (this.counter % 2 === 0) {
+
+    // Counter is used as a toggle flag which switch between 0 & -1
+    if (this.counter === 0) {
       bills.forEach((b) => {
         $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
       });
       $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
       $(".dashboard-right-container div").html(DashboardFormUI(bill));
       $(".vertical-navbar").css({ height: "150vh" });
-      this.counter++;
+      this.counter--;
     } else {
       $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
 
@@ -170,9 +172,11 @@ export default class {
 
     $(document).ready(() => {
       bills.forEach((bill) => {
-        $(`#open-bill${bill.id}`).click((e) =>
-          this.handleEditTicket(e, bill, bills)
-        );
+        $(`#open-bill${bill.id}`)
+          .off("click") // To unbind & bind again the event handler to the 'click" event to avoid multi-clicking use case
+          .click((e) => {
+            this.handleEditTicket(e, bill, bills);
+          });
       });
     });
 
