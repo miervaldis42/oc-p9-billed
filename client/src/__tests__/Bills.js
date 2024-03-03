@@ -21,6 +21,7 @@ import router from "../app/Router.js";
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
+      // Initial Data
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -30,14 +31,24 @@ describe("Given I am connected as an employee", () => {
           type: "Employee",
         })
       );
+
+      // Page Creation
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
       router();
       window.onNavigate(ROUTES_PATH.Bills);
+
+      // Actions
       await waitFor(() => screen.getByTestId("icon-window"));
-      const windowIcon = screen.getByTestId("icon-window");
-      //to-do write expect expression
+
+      // Check the icon has a CSS class and specifically the one which makes it highlighted
+      expect(
+        screen.getByTestId("icon-window").classList.length
+      ).toBeGreaterThan(0);
+      expect(
+        Object.values(screen.getByTestId("icon-window").classList)
+      ).toContain("active-icon");
     });
 
     test("Then, bills are ordered from the most recent to the oldest date", () => {
