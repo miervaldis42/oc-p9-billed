@@ -21,15 +21,17 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate });
   }
 
+  isFileExtensionValid = (file) => {
+    const validExtensions = ["image/jpeg", "image/png"];
+    return validExtensions.includes(file.type);
+  };
+
   handleChangeFile = (e) => {
     e.preventDefault();
 
-    const file = this.document.querySelector(`input[data-testid="file"]`)
-      .files[0];
-
     // If file extensions are image ones
-    const validExtensions = ["image/jpeg", "image/png"];
-    if (validExtensions.includes(file.type)) {
+    const file = this.fileInput.files[0];
+    if (this.isFileExtensionValid(file)) {
       this.fileInput.classList.add("blue-border");
 
       const filePath = e.target.value.split(/\\/g);
