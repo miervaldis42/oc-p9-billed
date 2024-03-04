@@ -3,16 +3,16 @@
  */
 
 // Jest
-import { screen, waitFor } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 
 // Assets
-import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import { orderByDescendingOrder } from "../containers/Bills.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
+import BillsUI from "../views/BillsUI.js";
+import Bills, { orderByDescendingOrder } from "../containers/Bills.js";
 
 // Router
-import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
 
 /**
@@ -20,7 +20,7 @@ import router from "../app/Router.js";
  */
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    test("Then bill icon in vertical layout should be highlighted", async () => {
+    test("Then, bill icon in vertical layout should be highlighted", async () => {
       // Initial Data
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -69,5 +69,37 @@ describe("Given I am connected as an employee", () => {
       // Expected Result
       expect(isDescending).toBe(true);
     });
-  });
+
+    describe("When I click on the button to create a new bill", () => {
+      test("Then, I am redirecting on 'New Bill' page", async () => {
+        // Context
+        document.body.innerHTML = BillsUI({ data: bills });
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const store = null;
+        const bill = new Bills({
+          document,
+          onNavigate,
+          store,
+          bills,
+          localStorage: window.localStorage,
+        });
+
+        // Action
+        const newBillButton = screen.getByTestId("btn-new-bill");
+        const handleClickNewBill = jest.fn((e) => bill.handleClickNewBill(e));
+        newBillButton.addEventListener("click", handleClickNewBill);
+        fireEvent.click(newBillButton);
+
+        expect(handleClickNewBill).toHaveBeenCalled();
+
+        // Result to check
+        const formNewBill = await waitFor(() =>
+          screen.getByTestId("form-new-bill")
+        );
+        expect(formNewBill).toBeTruthy();
+      });
+    });
+  }); // End of 'Use Case: User on the 'Bills' page
 });
