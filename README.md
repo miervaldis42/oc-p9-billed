@@ -34,9 +34,8 @@ Here is the stack used in the project :
 To run the project :
 
 1. Download the project
-2. Open a terminal, place yourself at the root of the project with `cd ./` & run `npm run install-all`
-3. The `concurrently` library will start the front-end & back-end projects in parallel to make sure the project is up and running with only 1 command, so run the `npm run start` command in the terminal
-4. To run the tests, use `npm run test-client` command to start the front-end tests
+2. The `concurrently` library will start the front-end & back-end projects in parallel to make sure the project is up and running with only 1 command, so run the `npm start` command in the terminal
+3. To run the tests, use `npm run test-client` command to start the front-end tests
 
 ## 🗒️ Account List
 
