@@ -11,7 +11,7 @@
     "client": "cd ./client && npm run start",
     "test-client": "cd ./client & npm run test",
     "test-server": "cd ./server & npm run test",
-    "start-dev": "npm run install-all && concurrently \"npm run server-dev\" \"npm run client\" & npm run test-client",
+    "start-dev": "npm run install-all && concurrently \"npm run server-dev\" \"npm run client\"",
     "start": "npm run install-all && concurrently \"npm run server-dev\" \"npm run client\""
   },
   "repository": {
