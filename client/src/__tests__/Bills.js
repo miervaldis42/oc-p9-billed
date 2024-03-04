@@ -4,6 +4,7 @@
 
 // Jest
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
 
 // Assets
 import { bills } from "../fixtures/bills.js";
@@ -95,6 +96,43 @@ describe("Given I am connected as an employee", () => {
 
         // Expected Result
         expect(isDescending).toBe(true);
+      });
+    });
+
+    describe("When I click on the first 'eye' icon", () => {
+      test("Then, a modal should open to display the bill proof", async () => {
+        document.body.innerHTML = BillsUI({ data: [bills[0]] });
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const store = null;
+        const bill = new Bills({
+          document,
+          onNavigate,
+          store,
+          bills,
+          localStorage: window.localStorage,
+        });
+
+        const iconEyes = screen.getAllByTestId("icon-eye");
+        $.fn.modal = jest.fn();
+        const handleClickIconEye1 = jest.fn(() =>
+          bill.handleClickIconEye(iconEyes[0])
+        );
+        iconEyes[0].addEventListener("click", handleClickIconEye1);
+        userEvent.click(iconEyes[0]);
+        expect(handleClickIconEye1).toHaveBeenCalled();
+
+        const modalElement = document.getElementById("modaleFile");
+        const imgElement = modalElement.querySelector("img");
+        expect(imgElement).toBeTruthy();
+        expect(imgElement.alt).toMatch(/bill/i);
+
+        // Verify that the <img> element has the specific bill proof
+        const expectedImageSource = iconEyes[0].getAttribute("data-bill-url");
+        const decodedActualImgSource = decodeURIComponent(imgElement.src);
+
+        expect(decodedActualImgSource).toContain(expectedImageSource);
       });
     });
 
