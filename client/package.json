@@ -1,6 +1,6 @@
 {
   "name": "oc-p9-billed-fe",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Front-end of the administrative website for Human Resource employees.",
   "scripts": {
     "test": "jest --coverage --watchAll --noStackTrace --silent",
