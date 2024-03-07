@@ -42,20 +42,7 @@ export default class NewBill {
       formData.append("file", file);
       formData.append("email", email);
 
-      this.store
-        .bills()
-        .create({
-          data: formData,
-          headers: {
-            noContentType: true,
-          },
-        })
-        .then(({ fileUrl, key }) => {
-          this.billId = key;
-          this.fileUrl = fileUrl;
-          this.fileName = fileName;
-        })
-        .catch((error) => console.error(error));
+      this.createFile(formData);
     } else {
       this.fileInput.value = null;
       this.fileInput.classList.remove("blue-border");
@@ -90,6 +77,29 @@ export default class NewBill {
     this.updateBill(bill);
 
     this.onNavigate(ROUTES_PATH["Bills"]);
+  };
+
+  createFile = (data) => {
+    if (this.store) {
+      return this.store
+        .bills()
+        .create({
+          data,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          console.log(fileUrl);
+          this.billId = key;
+          this.fileUrl = fileUrl;
+          // this.fileName = fileName
+        })
+        .catch((error) => {
+          console.error(error);
+          throw error;
+        });
+    }
   };
 
   // not need to cover this function by tests
