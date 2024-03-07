@@ -7,6 +7,8 @@ import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 
 // Assets
+import mockStore from "../__mocks__/store";
+jest.mock("../app/store", () => mockStore);
 import { bills } from "../fixtures/bills.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import BillsUI from "../views/BillsUI.js";
@@ -168,4 +170,59 @@ describe("Given I am connected as an employee", () => {
       });
     });
   }); // End of 'Use Case: User on the 'Bills' page
+
+  // Test d'intégration GET
+  describe("When an error occurs on API", () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, "bills");
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.appendChild(root);
+      router();
+    });
+
+    afterEach(() => (document.body.innerHTML = ""));
+
+    test("fetches bills from an API and fails with 404 message error", async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 404"));
+          },
+        };
+      });
+
+      window.onNavigate(ROUTES_PATH.Bills);
+      await new Promise(process.nextTick);
+      const messageHTML = await screen.getByText(/Erreur 404/i);
+
+      expect(messageHTML).toBeTruthy();
+      expect(messageHTML.innerHTML).toMatch(/Erreur 404/i);
+    });
+    test("fetches bills from an API and fails with 500 message error", async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 500"));
+          },
+        };
+      });
+
+      window.onNavigate(ROUTES_PATH.Bills);
+      await new Promise(process.nextTick);
+      const messageHTML = await screen.getByText(/Erreur 500/i);
+
+      expect(messageHTML).toBeTruthy();
+      expect(messageHTML.innerHTML).toMatch(/Erreur 500/i);
+    });
+  });
 });
